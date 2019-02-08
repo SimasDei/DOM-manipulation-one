@@ -8,7 +8,7 @@ GAME RULES:
 - The first player to reach 100 points on GLOBAL score wins the game
 
 */
-let scores, RoundScore, activePlayer;
+let scores, RoundScore, activePlayer, gameSession;
 
 init();
 
@@ -19,45 +19,52 @@ document.querySelector(
 */
 
 document.querySelector('.btn-roll').addEventListener('click', function() {
-  // 1. Random Number
-  let dice = Math.floor(Math.random() * 6) + 1;
-  // 2. Display result
-  let diceDOM = document.querySelector('.dice');
-  diceDOM.style.display = 'block';
-  diceDOM.src = `dice-${dice}.png`;
+  if (gameSession) {
+    // 1. Random Number
+    let dice = Math.floor(Math.random() * 6) + 1;
+    // 2. Display result
+    let diceDOM = document.querySelector('.dice');
+    diceDOM.style.display = 'block';
+    diceDOM.src = `dice-${dice}.png`;
 
-  // 3. Updated round Score IF roll was NOT 1
-  if (dice !== 1) {
-    // Add Score
-    roundScore += dice;
-    document.querySelector(`#current-${activePlayer}`).textContent = roundScore;
-  } else {
-    // Next Player
-    nextPlayer();
+    // 3. Updated round Score IF roll was NOT 1
+    if (dice !== 1) {
+      // Add Score
+      roundScore += dice;
+      document.querySelector(
+        `#current-${activePlayer}`
+      ).textContent = roundScore;
+    } else {
+      // Next Player
+      nextPlayer();
+    }
   }
 });
 
 document.querySelector('.btn-hold').addEventListener('click', function() {
-  // Add CURRENT score to GLOBAL score
-  scores[activePlayer] += roundScore;
-  // Update the UI
-  document.querySelector('#score-' + activePlayer).textContent =
-    scores[activePlayer];
+  if (gameSession) {
+    // Add CURRENT score to GLOBAL score
+    scores[activePlayer] += roundScore;
+    // Update the UI
+    document.querySelector('#score-' + activePlayer).textContent =
+      scores[activePlayer];
 
-  // Check if Played Won
-  if (scores[activePlayer] >= 20) {
-    document.querySelector('#name-' + activePlayer).textContent =
-      'You are Winrar!';
-    document.querySelector('.dice').style.display = 'none';
-    document
-      .querySelector('.player-' + activePlayer + '-panel')
-      .classList.add('winner');
-    document
-      .querySelector('.player-' + activePlayer + '-panel')
-      .classList.remove('active');
-  } else {
-    // Next Player
-    nextPlayer();
+    // Check if Played Won
+    if (scores[activePlayer] >= 20) {
+      document.querySelector('#name-' + activePlayer).textContent =
+        'You are Winrar!';
+      document.querySelector('.dice').style.display = 'none';
+      document
+        .querySelector('.player-' + activePlayer + '-panel')
+        .classList.add('winner');
+      document
+        .querySelector('.player-' + activePlayer + '-panel')
+        .classList.remove('active');
+      gameSession = false;
+    } else {
+      // Next Player
+      nextPlayer();
+    }
   }
 });
 
@@ -79,6 +86,7 @@ function init() {
   scores = [0, 0];
   activePlayer = 0;
   roundScore = 0;
+  gameSession = true;
 
   document.querySelector('.dice').style.display = 'none';
   document.getElementById('score-0').textContent = '0';
